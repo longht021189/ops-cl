@@ -3,6 +3,7 @@ package git
 import (
 	"fmt"
 	"log"
+	"os"
 
 	domain "github.com/longht021189/ops-cl/domain/action"
 	"github.com/spf13/cobra"
@@ -17,6 +18,12 @@ var removeSubmoduleCmd = &cobra.Command{
 	Short: "Remove Git Submodule",
 	Run: func(cmd *cobra.Command, args []string) {
 		var err error
+
+		// TODO input dir first
+		targetDir, err := os.Getwd()
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		if len(submodulePaths) <= 0 {
 			submodulePaths, err = domain.PickGitSubmodule()
