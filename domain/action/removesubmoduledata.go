@@ -10,7 +10,7 @@ import (
 func RemoveSubmoduleData(path string, arg *args.GitArgs) error {
 	dir := filepath.Join(*arg.GitRoot, "modules", path)
 
-	if _, err := os.Stat(gitRoot); !os.IsNotExist(err) {
+	if _, err := os.Stat(dir); !os.IsNotExist(err) {
 		return os.RemoveAll(dir)
 	}
 
