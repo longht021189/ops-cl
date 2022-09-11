@@ -2,6 +2,7 @@ package git
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
 
@@ -21,7 +22,9 @@ var removeSubmoduleCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		err := runRemoveSubmodule()
 		if err != nil {
-			log.Fatal(err)
+			// TODO Report error
+			fmt.Printf("Error: %v", err)
+			os.Exit(1)
 		}
 	},
 }
