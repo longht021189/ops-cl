@@ -3,11 +3,15 @@ package git
 import (
 	"strings"
 
+	"github.com/longht021189/ops-cl/model/args"
 	"github.com/longht021189/ops-cl/utils/exe"
 )
 
-func ListSubmodule() ([]string, error) {
-	output, err := exe.Run("git", "-C", "D:/Projects/github.com/longht021189/resa-project", "submodule")
+func ListSubmodule(data *args.GitArgs) ([]string, error) {
+	args := data.BuildPrefixCmd()
+	args = append(args, "submodule")
+
+	output, err := exe.Run(args...)
 	if err != nil {
 		return nil, err
 	}

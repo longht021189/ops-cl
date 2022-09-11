@@ -4,12 +4,16 @@ import (
 	"fmt"
 
 	git "github.com/longht021189/ops-cl/domain/git"
+	"github.com/longht021189/ops-cl/model/args"
 )
 
-func PickGitSubmodule() ([]string, error) {
-	submodules, err := git.ListSubmodule()
+func PickGitSubmodule(data *args.GitArgs) ([]string, error) {
+	submodules, err := git.ListSubmodule(data)
 	if err != nil {
 		return nil, err
+	}
+	if len(submodules) <= 0 {
+		return nil, nil
 	}
 
 	fmt.Println("Submodules:")

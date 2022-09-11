@@ -1,46 +1,77 @@
 package git
 
 import (
-	"fmt"
+	"errors"
 	"log"
 	"os"
 
 	domain "github.com/longht021189/ops-cl/domain/action"
+	"github.com/longht021189/ops-cl/domain/git"
+	a "github.com/longht021189/ops-cl/model/args"
 	"github.com/spf13/cobra"
 )
 
 var (
-	submodulePaths []string
+	gitArgs = &a.GitArgs{}
 )
 
 var removeSubmoduleCmd = &cobra.Command{
 	Use:   "remove-submodule",
 	Short: "Remove Git Submodule",
 	Run: func(cmd *cobra.Command, args []string) {
-		var err error
-
-		// TODO input dir first
-		targetDir, err := os.Getwd()
+		err := runRemoveSubmodule()
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		if len(submodulePaths) <= 0 {
-			submodulePaths, err = domain.PickGitSubmodule()
-		}
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		fmt.Printf("\n\naaaa: %v", submodulePaths)
 	},
 }
 
 func init() {
 	gitCmd.AddCommand(removeSubmoduleCmd)
-	removeSubmoduleCmd.Flags().StringSliceVar(&submodulePaths, "path", nil, "Submodule Path")
+	removeSubmoduleCmd.Flags().StringSliceVar(&gitArgs.SubmodulePaths, "path", nil, "Submodule Path")
 }
 
-// git rm -f projects/github.com/longht021189/ops-cl
-// rm -rf .git/modules/projects/github.com/longht021189/ops-cl
-// git config --remove-section submodule.projects/github.com/longht021189/ops-cl
+func runRemoveSubmodule() error {
+	var err error
+
+	// TODO input dir first
+	gitArgs.TargetDir, err = os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	gitArgs.GitRoot, err = domain.FindGitRoot(gitArgs.TargetDir)
+	if err != nil {
+		return err
+	}
+	if gitArgs.GitRoot == nil {
+		// TODO define error code
+		return errors.New("Git Root not Found")
+	}
+
+	if len(gitArgs.SubmodulePaths) <= 0 {
+		gitArgs.SubmodulePaths, err = domain.PickGitSubmodule(gitArgs)
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, submodule := range gitArgs.SubmodulePaths {
+		err = git.RemoveSubmodule(submodule, gitArgs)
+		if err != nil {
+			return err
+		}
+
+		err = git.RemoveSection(submodule, gitArgs)
+		if err != nil {
+			return err
+		}
+
+		err = domain.RemoveSubmoduleData(submodule, gitArgs)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
