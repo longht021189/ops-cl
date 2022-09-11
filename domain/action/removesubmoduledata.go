@@ -5,12 +5,13 @@ import (
 	"path/filepath"
 
 	"github.com/longht021189/ops-cl/model/args"
+	"github.com/longht021189/ops-cl/utils/file"
 )
 
 func RemoveSubmoduleData(path string, arg *args.GitArgs) error {
 	dir := filepath.Join(*arg.GitRoot, "modules", path)
 
-	if _, err := os.Stat(dir); !os.IsNotExist(err) {
+	if file.Exists(dir) {
 		return os.RemoveAll(dir)
 	}
 

@@ -1,15 +1,16 @@
 package action
 
 import (
-	"os"
 	"path/filepath"
+
+	"github.com/longht021189/ops-cl/utils/file"
 )
 
 func FindGitRoot(path string) (*string, error) {
 	for len(path) > 0 {
 		gitRoot := filepath.Join(path, ".git")
 
-		if _, err := os.Stat(gitRoot); !os.IsNotExist(err) {
+		if file.Exists(gitRoot) {
 			return &path, nil
 		}
 
