@@ -24,9 +24,11 @@ func GetBinaryDependencies(path string) ([]string, error) {
 		values := re.FindStringSubmatch(text)
 		length := len(values)
 
-		if length > 0 && file.Exists(values[length-1]) {
+		if length > 0 {
 			v := strings.TrimSpace(values[length-1])
-			result = append(result, v)
+			if file.Exists(v) {
+				result = append(result, v)
+			}
 		}
 	}
 
