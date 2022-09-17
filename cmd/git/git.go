@@ -14,6 +14,6 @@ var gitCmd = &cobra.Command{
 	},
 }
 
-func Get() *cobra.Command {
-	return gitCmd
+func InitCmd(rootCmd *cobra.Command) {
+	rootCmd.AddCommand(gitCmd)
 }
