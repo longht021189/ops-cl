@@ -2,29 +2,31 @@ package action
 
 import (
 	"regexp"
+	"strings"
 
+	"github.com/longht021189/ops-cl/utils/exe"
 	"github.com/longht021189/ops-cl/utils/file"
 )
 
 func GetBinaryDependencies(path string) ([]string, error) {
-	var result []string
-
-	lines := []string{
-		"linux-vdso.so.1 (0x00007ffcfb0c5000)",
-		"libFoundation.so => /usr/lib/swift/linux/libFoundation.so (0x00007f4c5a421000)",
-		"libswiftGlibc.so => /usr/lib/swift/linux/libswiftGlibc.so (0x00007f4c5b111000)",
-		"libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f4c5a083000)",
-		"/lib64/ld-linux-x86-64.so.2 (0x00007f4c5aefe000)",
-		"libswift_Concurrency.so => /usr/lib/swift/linux/libswift_Concurrency.so (0x00007f4c5b081000)",
+	data, err := exe.Run("ldd", path)
+	if err != nil {
+		return nil, err
 	}
 
+	var result []string
+
+	lines := strings.Split(string(data), "\n")
 	re := regexp.MustCompile(`(.* ?=>)?(.*)\(.*\)`)
+
 	for _, line := range lines {
-		values := re.FindStringSubmatch(line)
+		text := strings.TrimSpace(line)
+		values := re.FindStringSubmatch(text)
 		length := len(values)
 
 		if length > 0 && file.Exists(values[length-1]) {
-			result = append(result, values[length-1])
+			v := strings.TrimSpace(values[length-1])
+			result = append(result, v)
 		}
 	}
 

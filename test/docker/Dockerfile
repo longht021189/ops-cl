@@ -11,7 +11,7 @@ RUN tar -xf go.tar.gz
 
 ENV PATH="/app/go/bin:$PATH"
 ENV GOPATH="/app/godata"
-ENV GOROOT="/app/go/bin"
+ENV GOROOT="/app/go"
 
 ARG CACHEBUST=1
 RUN go install github.com/longht021189/ops-cl@latest
